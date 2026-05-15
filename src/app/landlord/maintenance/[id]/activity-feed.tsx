@@ -3,6 +3,7 @@
 import * as React from "react";
 import {
   Send, Sparkles, CheckCircle2, XCircle, Bell, ChevronDown, Wrench, Truck,
+  type LucideIcon,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -18,7 +19,7 @@ export type ActivityEvent = {
   tag?: string;
 };
 
-const ICONS: Record<ActivityEvent["kind"], React.ComponentType<{ size?: number; className?: string }>> = {
+const ICONS: Record<ActivityEvent["kind"], LucideIcon> = {
   "submitted":        Send,
   "ai-capture":       Sparkles,
   "triage-complete":  Wrench,
