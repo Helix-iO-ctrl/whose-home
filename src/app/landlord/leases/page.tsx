@@ -2,7 +2,7 @@ import { FileText, CalendarClock, CheckCircle2, Clock, Plus } from "lucide-react
 import { PageHeader, SectionHead } from "@/components/ui/section";
 import { Card } from "@/components/ui/card";
 import { Chip } from "@/components/ui/chip";
-import { Button } from "@/components/ui/button";
+import { StubButton } from "@/components/ui/stub-button";
 import { Module } from "@/components/feedback/module";
 import { leases, getTenant, getUnit } from "@/lib/data";
 import { currency, longDate } from "@/lib/utils";
@@ -18,7 +18,15 @@ export default function LeasesPage() {
         eyebrow="Leases"
         title="Lease library"
         subtitle="All active leases, signed copies, and upcoming renewals in one place."
-        actions={<Button variant="primary"><Plus size={14} /> Draft new lease</Button>}
+        actions={
+          <StubButton
+            variant="primary"
+            toast="Lease drafting wizard coming soon — will pre-fill from a unit + tenant pair."
+            tone="info"
+          >
+            <Plus size={14} /> Draft new lease
+          </StubButton>
+        }
       />
 
       <Module id="landlord.leases.list" label="Active leases">
@@ -48,8 +56,23 @@ export default function LeasesPage() {
                     </div>
                   </div>
                   <div className="shrink-0 flex flex-col gap-2">
-                    <Button variant="outline" size="sm">View</Button>
-                    {renewalSoon && <Button variant="primary" size="sm">Send renewal</Button>}
+                    <StubButton
+                      variant="outline"
+                      size="sm"
+                      toast={`Opened ${tenant?.name}'s lease PDF (demo).`}
+                      tone="info"
+                    >
+                      View
+                    </StubButton>
+                    {renewalSoon && (
+                      <StubButton
+                        variant="primary"
+                        size="sm"
+                        toast={`Renewal offer sent to ${tenant?.name} — they'll get an in-app notification + email.`}
+                      >
+                        Send renewal
+                      </StubButton>
+                    )}
                   </div>
                 </li>
               );

@@ -12,6 +12,7 @@ import { Field, Input, Textarea, Select } from "@/components/ui/input";
 import { Module } from "@/components/feedback/module";
 import { Chip } from "@/components/ui/chip";
 import { cn } from "@/lib/utils";
+import { useToast } from "@/components/ui/toast";
 
 type Step = 1 | 2 | 3 | 4;
 
@@ -21,8 +22,10 @@ export default function NewRequestPage() {
   const [description, setDescription] = React.useState("");
   const [make, setMake] = React.useState("Bosch");
   const [model, setModel] = React.useState("SHE53C85N");
+  const [photoAttached, setPhotoAttached] = React.useState(false);
   const [done, setDone] = React.useState<Record<number, boolean>>({});
   const [resolution, setResolution] = React.useState<"resolved" | "escalate" | null>(null);
+  const toast = useToast();
 
   return (
     <>
@@ -85,8 +88,22 @@ export default function NewRequestPage() {
                 />
               </Field>
               <Field label="Add a photo (optional)">
-                <button type="button" className="rounded-lg border border-dashed border-line-2 bg-spruce/40 hover:bg-pine-2 transition-colors w-full py-6 text-sm text-muted flex items-center justify-center gap-2">
-                  <Camera size={14} /> Tap to attach
+                <button
+                  type="button"
+                  onClick={() => {
+                    setPhotoAttached(true);
+                    toast.show("Photo attached (demo).", { tone: "info" });
+                  }}
+                  className={cn(
+                    "rounded-lg border border-dashed w-full py-6 text-sm flex items-center justify-center gap-2 transition-colors",
+                    photoAttached
+                      ? "bg-moss/15 border-moss/50 text-moss"
+                      : "border-line-2 bg-spruce/40 hover:bg-pine-2 text-muted",
+                  )}
+                >
+                  {photoAttached
+                    ? <><CheckCircle2 size={14} /> Photo attached &middot; tap to replace</>
+                    : <><Camera size={14} /> Tap to attach</>}
                 </button>
               </Field>
             </div>

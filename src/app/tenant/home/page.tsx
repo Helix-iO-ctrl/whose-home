@@ -6,6 +6,7 @@ import { PageHeader, SectionHead } from "@/components/ui/section";
 import { Card, CardLabel } from "@/components/ui/card";
 import { Chip } from "@/components/ui/chip";
 import { Button } from "@/components/ui/button";
+import { StubButton } from "@/components/ui/stub-button";
 import { Module } from "@/components/feedback/module";
 import { getTenant, getUnit, leases, requests } from "@/lib/data";
 import { currency, longDate } from "@/lib/utils";
@@ -36,8 +37,17 @@ export default function TenantHomePage() {
               </div>
             </div>
             <div className="flex flex-col gap-2">
-              <Button variant="primary" size="md">View receipt</Button>
-              <Button variant="outline" size="sm"><CreditCard size={13} /> Autopay on</Button>
+              <StubButton variant="primary" size="md" toast="May rent receipt downloaded." tone="info">
+                View receipt
+              </StubButton>
+              <StubButton
+                variant="outline"
+                size="sm"
+                toast="Autopay is on — next charge May 1, 2026 from card ending 4242."
+                tone="info"
+              >
+                <CreditCard size={13} /> Autopay on
+              </StubButton>
             </div>
           </div>
         </Card>

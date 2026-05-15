@@ -4,6 +4,7 @@ import { PageHeader } from "@/components/ui/section";
 import { Card } from "@/components/ui/card";
 import { Chip } from "@/components/ui/chip";
 import { Button } from "@/components/ui/button";
+import { StubButton } from "@/components/ui/stub-button";
 import { Module } from "@/components/feedback/module";
 import { properties, getTenant } from "@/lib/data";
 import { currency, longDate } from "@/lib/utils";
@@ -15,7 +16,16 @@ export default function PropertiesPage() {
         eyebrow="Portfolio"
         title="Properties"
         subtitle="Your full portfolio in one place. Tap a unit to manage its tenant, lease, and history."
-        actions={<Button variant="outline" size="md"><Plus size={14} /> Add property</Button>}
+        actions={
+          <StubButton
+            variant="outline"
+            size="md"
+            toast="Add-property flow coming in V1.5 — would walk you through unit count, address, and tenant import."
+            tone="info"
+          >
+            <Plus size={14} /> Add property
+          </StubButton>
+        }
       />
 
       <div className="space-y-5">

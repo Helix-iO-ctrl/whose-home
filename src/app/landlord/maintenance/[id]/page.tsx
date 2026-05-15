@@ -1,15 +1,18 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import {
-  ArrowLeft, MessageSquare, Phone, Send, Camera, CheckCircle2, XCircle, Sparkles,
+  ArrowLeft, MessageSquare, Phone, Camera, CheckCircle2, XCircle, Sparkles,
 } from "lucide-react";
 import { Card, CardLabel, CardTitle } from "@/components/ui/card";
 import { Chip } from "@/components/ui/chip";
 import { Button } from "@/components/ui/button";
+import { StubButton } from "@/components/ui/stub-button";
 import { Module } from "@/components/feedback/module";
 import { DispatchAction } from "./dispatch-action";
+import { ActivityFeed, type ActivityEvent } from "./activity-feed";
 import { getRequest, getTenant, getUnit, vendors } from "@/lib/data";
-import { longDate } from "@/lib/utils";
+import type { MaintenanceRequest } from "@/lib/data";
+import { longDate, shortDate } from "@/lib/utils";
 
 export default function RequestDetailPage({ params }: { params: { id: string } }) {
   const { id } = params;
@@ -25,6 +28,9 @@ export default function RequestDetailPage({ params }: { params: { id: string } }
       : r.category === "electrical" ? v.trade === "Electrical"
       : true),
   );
+
+  const activities = buildActivityFeed(r);
+  const recommendation = buildRecommendation(r);
 
   return (
     <>
@@ -81,8 +87,7 @@ export default function RequestDetailPage({ params }: { params: { id: string } }
                   ))}
                 </ul>
                 <div className="mt-4 rounded-lg bg-forest/30 border border-line p-3 text-xs text-parchment leading-relaxed">
-                  <span className="text-gold-2 font-semibold">Recommendation:</span>{" "}
-                  Door seal and drain hose are clean. Likely a faulty inlet valve or sump assembly &mdash; needs a plumber.
+                  <span className="text-gold-2 font-semibold">Recommendation:</span> {recommendation}
                 </div>
               </Card>
             </Module>
@@ -103,8 +108,16 @@ export default function RequestDetailPage({ params }: { params: { id: string } }
                   </div>
                   <div className="rounded-lg bg-spruce/60 border border-line p-3 col-span-2">
                     <dt className="overline">Tenant photo</dt>
-                    <dd className="mt-2 flex items-center gap-2 text-xs text-muted">
-                      <Camera size={14} /> 1 photo attached &middot; click in real app
+                    <dd className="mt-2 flex items-center justify-between gap-2 text-xs text-muted">
+                      <span className="flex items-center gap-1.5"><Camera size={14} /> 1 photo attached</span>
+                      <StubButton
+                        variant="ghost"
+                        size="sm"
+                        toast="Photo opened in lightbox (demo)"
+                        tone="info"
+                      >
+                        View
+                      </StubButton>
                     </dd>
                   </div>
                 </dl>
@@ -139,13 +152,7 @@ export default function RequestDetailPage({ params }: { params: { id: string } }
           <Module id={`landlord.request.${r.id}.history`} label="Activity">
             <Card>
               <CardLabel>Activity</CardLabel>
-              <ol className="mt-3 space-y-3">
-                <Activity at="May 13, 6:42 PM" body="James submitted request with description and 1 photo." />
-                <Activity at="May 13, 6:43 PM" body="AI captured appliance info: Bosch SHE53C85N." />
-                <Activity at="May 13, 6:48 PM" body="Tenant completed troubleshooting (2 of 3 steps passed)." />
-                <Activity at="May 13, 6:52 PM" body="Escalated to landlord." />
-                {r.status === "scheduled" && <Activity at="May 15, 8:14 AM" body="Vendor dispatched." />}
-              </ol>
+              <ActivityFeed events={activities} troubleshooting={r.troubleshooting ?? null} />
             </Card>
           </Module>
         </div>
@@ -154,16 +161,87 @@ export default function RequestDetailPage({ params }: { params: { id: string } }
   );
 }
 
-function Activity({ at, body }: { at: string; body: string }) {
-  return (
-    <li className="flex gap-3">
-      <span className="mt-1.5 h-1.5 w-1.5 rounded-full bg-gold-2 shrink-0" />
-      <div>
-        <div className="text-sm text-parchment">{body}</div>
-        <div className="text-[11px] text-subtle mt-0.5">{at}</div>
-      </div>
-    </li>
-  );
+// ───────────────────────── helpers ─────────────────────────
+
+function buildActivityFeed(r: MaintenanceRequest): ActivityEvent[] {
+  const submitted = new Date(r.submittedAt);
+  const aiCaptured = new Date(submitted.getTime() + 60_000);
+  const triageDone = new Date(submitted.getTime() + 6 * 60_000);
+  const escalated  = new Date(submitted.getTime() + 10 * 60_000);
+
+  const events: ActivityEvent[] = [
+    {
+      kind: "submitted",
+      tone: "info",
+      title: "Tenant submitted request",
+      detail: "1 photo attached",
+      at: formatAt(submitted),
+    },
+  ];
+
+  if (r.appliance) {
+    events.push({
+      kind: "ai-capture",
+      tone: "info",
+      title: `AI captured appliance info`,
+      detail: `${r.appliance.make} ${r.appliance.model}`,
+      at: formatAt(aiCaptured),
+    });
+  }
+
+  if (r.troubleshooting) {
+    const passed = r.troubleshooting.filter((s) => s.passed).length;
+    events.push({
+      kind: "triage-complete",
+      tone: r.troubleshooting.some((s) => !s.passed) ? "warning" : "success",
+      title: "Tenant completed troubleshooting",
+      detail: `${passed} of ${r.troubleshooting.length} steps passed`,
+      at: formatAt(triageDone),
+      expandable: true,
+    });
+  }
+
+  if (["needs-vendor", "scheduled", "in-progress"].includes(r.status)) {
+    events.push({
+      kind: "escalated",
+      tone: "critical",
+      title: "Escalated to landlord",
+      detail: "Self-fix steps did not resolve the issue.",
+      at: formatAt(escalated),
+      tag: "Needs you",
+    });
+  }
+
+  if (r.status === "scheduled" && r.scheduledFor) {
+    const dispatched = new Date(r.scheduledFor); dispatched.setDate(dispatched.getDate() - 1);
+    events.push({
+      kind: "dispatched",
+      tone: "success",
+      title: "Vendor dispatched",
+      detail: `Arriving ${shortDate(r.scheduledFor)}, 2–4 PM window`,
+      at: formatAt(dispatched),
+    });
+  }
+
+  return events;
+}
+
+function buildRecommendation(r: MaintenanceRequest): string {
+  switch (r.category) {
+    case "appliance":
+    case "plumbing":
+      return "Tenant ruled out the obvious causes. Likely a faulty internal part — needs a plumber on-site.";
+    case "hvac":
+      return "Filter and thermostat ruled out. Probably a refrigerant or compressor issue — HVAC tech required.";
+    case "electrical":
+      return "Tenant tried bulb and battery swaps. Suggests a wiring or motor fault — electrician on-site.";
+    default:
+      return "Tenant exhausted the self-service path — vendor visit recommended.";
+  }
+}
+
+function formatAt(d: Date): string {
+  return d.toLocaleString("en-US", { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" });
 }
 
 function labelFor(status: string) {

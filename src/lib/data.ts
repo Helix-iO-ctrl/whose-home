@@ -159,6 +159,12 @@ export const requests: MaintenanceRequest[] = [
     status: "triaging",
     submittedBy: "t-maria",
     submittedAt: "2026-05-12T14:10:00Z",
+    appliance: { make: "Trane", model: "XR14 4TTR4036" },
+    troubleshooting: [
+      { step: "Replaced air filter — was visibly dirty",                      passed: true  },
+      { step: "Set thermostat to 'cool' and lowered 5° below ambient",        passed: true  },
+      { step: "Waited 20 minutes — still blowing room-temp air",              passed: false },
+    ],
   },
   {
     id: "r-003",
@@ -169,6 +175,11 @@ export const requests: MaintenanceRequest[] = [
     status: "new",
     submittedBy: "t-priya",
     submittedAt: "2026-05-14T09:05:00Z",
+    appliance: { make: "InSinkErator", model: "Badger 5" },
+    troubleshooting: [
+      { step: "Ran disposal with cold water for 60 seconds",                  passed: true  },
+      { step: "Poured hot water + dish soap down drain",                      passed: false },
+    ],
   },
   {
     id: "r-004",
@@ -181,6 +192,12 @@ export const requests: MaintenanceRequest[] = [
     submittedAt: "2026-05-08T20:22:00Z",
     vendorId: "v-sparks",
     scheduledFor: "2026-05-19T14:00:00Z",
+    appliance: { make: "LiftMaster", model: "8500W" },
+    troubleshooting: [
+      { step: "Verified safety sensors aligned (both LEDs solid)",            passed: true  },
+      { step: "Replaced opener bulb with LED rated for door openers",         passed: true  },
+      { step: "Replaced remote battery — issue persisted with wall button",   passed: false },
+    ],
   },
 ];
 

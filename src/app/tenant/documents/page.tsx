@@ -2,7 +2,9 @@ import { FileText, ClipboardCheck, ScrollText, CalendarClock, Download } from "l
 import { PageHeader, SectionHead } from "@/components/ui/section";
 import { Card, CardLabel, CardTitle } from "@/components/ui/card";
 import { Chip } from "@/components/ui/chip";
+import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import { StubButton } from "@/components/ui/stub-button";
 import { Module } from "@/components/feedback/module";
 import { leases, getTenant, getUnit } from "@/lib/data";
 import { currency, longDate } from "@/lib/utils";
@@ -45,8 +47,16 @@ export default function TenantDocumentsPage() {
                 ({currency(25)} increase). 12-month term, all other terms unchanged.
               </p>
               <div className="mt-4 flex flex-wrap gap-2">
-                <Button variant="primary">Review & sign</Button>
-                <Button variant="outline">Ask a question</Button>
+                <StubButton
+                  variant="primary"
+                  toast="Renewal opened in DocuSign-style flow (demo)."
+                  tone="info"
+                >
+                  Review & sign
+                </StubButton>
+                <Link href="/tenant/messages">
+                  <Button variant="outline">Ask a question</Button>
+                </Link>
               </div>
             </div>
           </div>
@@ -69,7 +79,15 @@ function Doc({
         <div className="text-xs text-muted mt-0.5">{meta}</div>
       </div>
       <Chip tone={tone}>{chip}</Chip>
-      <Button variant="ghost" size="sm"><Download size={13} /></Button>
+      <StubButton
+        variant="ghost"
+        size="sm"
+        toast={`${title} downloaded.`}
+        tone="info"
+        aria-label={`Download ${title}`}
+      >
+        <Download size={13} />
+      </StubButton>
     </li>
   );
 }

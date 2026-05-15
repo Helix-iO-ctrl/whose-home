@@ -2,7 +2,7 @@ import { CreditCard, CheckCircle2, RotateCcw, Download } from "lucide-react";
 import { PageHeader, SectionHead } from "@/components/ui/section";
 import { Card, CardLabel } from "@/components/ui/card";
 import { Chip } from "@/components/ui/chip";
-import { Button } from "@/components/ui/button";
+import { StubButton } from "@/components/ui/stub-button";
 import { Module } from "@/components/feedback/module";
 import { payments, getTenant, getUnit, leases } from "@/lib/data";
 import { currency, longDate } from "@/lib/utils";
@@ -33,8 +33,17 @@ export default function TenantPaymentsPage() {
               <div className="mt-1 text-xs text-subtle">{unit.property.name} &middot; {unit.unit.label}</div>
             </div>
             <div className="flex flex-col gap-2">
-              <Button variant="primary"><CreditCard size={14} /> Pay early</Button>
-              <Button variant="outline" size="sm"><RotateCcw size={13} /> Manage autopay</Button>
+              <StubButton variant="primary" toast="Demo: would open Stripe to pay May rent early.">
+                <CreditCard size={14} /> Pay early
+              </StubButton>
+              <StubButton
+                variant="outline"
+                size="sm"
+                toast="Autopay opened — next charge May 1, 2026 from card ending 4242."
+                tone="info"
+              >
+                <RotateCcw size={13} /> Manage autopay
+              </StubButton>
             </div>
           </div>
         </Card>
@@ -54,7 +63,14 @@ export default function TenantPaymentsPage() {
                   <div className="text-xs text-muted">{p.method} &middot; transaction #{p.id.toUpperCase()}</div>
                 </div>
                 <div className="text-sm font-semibold text-parchment tabular">{currency(p.amount)}</div>
-                <Button variant="ghost" size="sm"><Download size={13} /> Receipt</Button>
+                <StubButton
+                  variant="ghost"
+                  size="sm"
+                  toast={`${longDate(p.date)} receipt downloaded.`}
+                  tone="info"
+                >
+                  <Download size={13} /> Receipt
+                </StubButton>
               </li>
             ))}
           </ul>

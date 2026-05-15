@@ -1,9 +1,17 @@
 "use client";
 
 import * as React from "react";
+import { createPortal } from "react-dom";
 import { X } from "lucide-react";
 import { cn } from "@/lib/utils";
 
+/**
+ * Modal dialog. Portals to document.body so it escapes any ancestor
+ * stacking context (e.g. parent Cards use `backdrop-blur-sm`, which per
+ * spec creates a containing block for descendant `position: fixed`
+ * elements — without portaling, the dialog would render trapped inside
+ * its parent column).
+ */
 export function Dialog({
   open, onClose, title, children, size = "md",
 }: {
@@ -13,20 +21,32 @@ export function Dialog({
   children: React.ReactNode;
   size?: "sm" | "md" | "lg";
 }) {
+  const [mounted, setMounted] = React.useState(false);
+  React.useEffect(() => { setMounted(true); }, []);
+
   React.useEffect(() => {
     if (!open) return;
     const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
     window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
+    // Lock body scroll while open so the page behind doesn't move.
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      window.removeEventListener("keydown", onKey);
+      document.body.style.overflow = prev;
+    };
   }, [open, onClose]);
 
-  if (!open) return null;
+  if (!open || !mounted) return null;
 
-  const widthClass = size === "lg" ? "sm:max-w-lg" : size === "sm" ? "sm:max-w-sm" : "sm:max-w-md";
+  const widthClass =
+    size === "lg" ? "sm:max-w-lg" :
+    size === "sm" ? "sm:max-w-sm" :
+                    "sm:max-w-md";
 
-  return (
+  return createPortal(
     <div
-      className="fixed inset-0 z-50 flex items-end sm:items-center justify-center animate-fade-in"
+      className="fixed inset-0 z-[60] flex items-end sm:items-center justify-center animate-fade-in"
       onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
     >
       <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" aria-hidden="true" />
@@ -52,6 +72,7 @@ export function Dialog({
         </div>
         {children}
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 }

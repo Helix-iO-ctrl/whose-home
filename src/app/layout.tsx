@@ -3,6 +3,7 @@ import { Libre_Baskerville, DM_Sans } from "next/font/google";
 import "./globals.css";
 import { FeedbackProvider } from "@/components/feedback/feedback-provider";
 import { FeedbackButton } from "@/components/feedback/feedback-button";
+import { ToastProvider } from "@/components/ui/toast";
 
 const display = Libre_Baskerville({
   subsets: ["latin"],
@@ -29,10 +30,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en" className={`${display.variable} ${sans.variable}`}>
       <body>
-        <FeedbackProvider>
-          {children}
-          <FeedbackButton />
-        </FeedbackProvider>
+        <ToastProvider>
+          <FeedbackProvider>
+            {children}
+            <FeedbackButton />
+          </FeedbackProvider>
+        </ToastProvider>
       </body>
     </html>
   );

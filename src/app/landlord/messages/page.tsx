@@ -11,8 +11,10 @@ import { Button } from "@/components/ui/button";
 import { messages, tenants } from "@/lib/data";
 import { relativeTime } from "@/lib/utils";
 import { cn } from "@/lib/utils";
+import { useToast } from "@/components/ui/toast";
 
 export default function MessagesPage() {
+  const toast = useToast();
   const threadIds = Array.from(new Set(messages.map((m) => m.threadId)));
   const [active, setActive] = React.useState(threadIds[0]);
   const [draft, setDraft] = React.useState("");
@@ -98,7 +100,12 @@ export default function MessagesPage() {
 
             <form
               className="p-4 border-t border-line flex items-center gap-2"
-              onSubmit={(e) => { e.preventDefault(); setDraft(""); }}
+              onSubmit={(e) => {
+                e.preventDefault();
+                if (!draft.trim()) return;
+                toast.show(`Sent to ${tenantForThread(active)?.name ?? "tenant"}.`);
+                setDraft("");
+              }}
             >
               <Input
                 value={draft}

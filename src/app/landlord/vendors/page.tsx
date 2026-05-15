@@ -2,7 +2,7 @@ import { Wrench, Snowflake, Zap, KeyRound, Hammer, Phone, Mail, Plus } from "luc
 import { PageHeader } from "@/components/ui/section";
 import { Card } from "@/components/ui/card";
 import { Chip } from "@/components/ui/chip";
-import { Button } from "@/components/ui/button";
+import { StubButton } from "@/components/ui/stub-button";
 import { Module } from "@/components/feedback/module";
 import { vendors } from "@/lib/data";
 
@@ -21,7 +21,15 @@ export default function VendorsPage() {
         eyebrow="Directory"
         title="Vendors"
         subtitle="Your trusted contractors by trade. One tap to dispatch from any maintenance request."
-        actions={<Button variant="primary"><Plus size={14} /> Add vendor</Button>}
+        actions={
+          <StubButton
+            variant="primary"
+            toast="Add-vendor flow coming soon — name, trade, and preferred contact channel."
+            tone="info"
+          >
+            <Plus size={14} /> Add vendor
+          </StubButton>
+        }
       />
 
       <div className="grid sm:grid-cols-2 gap-4">

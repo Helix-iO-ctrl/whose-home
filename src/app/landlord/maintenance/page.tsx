@@ -3,7 +3,7 @@ import { Wrench, AlertTriangle, CheckCircle2, Clock, Filter } from "lucide-react
 import { PageHeader, SectionHead } from "@/components/ui/section";
 import { Card } from "@/components/ui/card";
 import { Chip } from "@/components/ui/chip";
-import { Button } from "@/components/ui/button";
+import { StubButton } from "@/components/ui/stub-button";
 import { Module } from "@/components/feedback/module";
 import { requests, getTenant, getUnit } from "@/lib/data";
 import { relativeTime } from "@/lib/utils";
@@ -20,7 +20,16 @@ export default function MaintenancePage() {
         eyebrow="Maintenance"
         title="Triage queue"
         subtitle="AI captures the make, model, and tenant troubleshooting before it ever reaches you. You decide who gets dispatched."
-        actions={<Button variant="outline" size="md"><Filter size={14} /> Filter</Button>}
+        actions={
+          <StubButton
+            variant="outline"
+            size="md"
+            toast="Filter coming soon — by unit, status, age, vendor."
+            tone="info"
+          >
+            <Filter size={14} /> Filter
+          </StubButton>
+        }
       />
 
       <div className="space-y-6">

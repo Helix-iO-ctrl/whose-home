@@ -3,7 +3,7 @@ import { PageHeader, SectionHead } from "@/components/ui/section";
 import { Card } from "@/components/ui/card";
 import { Chip } from "@/components/ui/chip";
 import { Stat } from "@/components/ui/stat";
-import { Button } from "@/components/ui/button";
+import { StubButton } from "@/components/ui/stub-button";
 import { Module } from "@/components/feedback/module";
 import { Avatar } from "@/components/ui/avatar";
 import { payments, getTenant, getUnit, totalCollected, totalOutstanding } from "@/lib/data";
@@ -65,7 +65,13 @@ export default function PaymentsPage() {
             })}
           </ul>
           <div className="mt-4 flex justify-end">
-            <Button variant="outline" size="sm"><Send size={13} /> Send late notice</Button>
+            <StubButton
+              variant="outline"
+              size="sm"
+              toast="Late notice queued — Tom will get a templated SMS in ~10 seconds."
+            >
+              <Send size={13} /> Send late notice
+            </StubButton>
           </div>
         </Card>
       </Module>

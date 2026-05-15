@@ -10,10 +10,12 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { messages } from "@/lib/data";
 import { relativeTime, cn } from "@/lib/utils";
+import { useToast } from "@/components/ui/toast";
 
 export default function TenantMessagesPage() {
   const thread = messages.filter((m) => m.threadId === "thread-james");
   const [draft, setDraft] = React.useState("");
+  const toast = useToast();
 
   return (
     <>
@@ -48,7 +50,12 @@ export default function TenantMessagesPage() {
           </ul>
           <form
             className="p-4 border-t border-line flex items-center gap-2"
-            onSubmit={(e) => { e.preventDefault(); setDraft(""); }}
+            onSubmit={(e) => {
+              e.preventDefault();
+              if (!draft.trim()) return;
+              toast.show("Sent to Greg.");
+              setDraft("");
+            }}
           >
             <Input value={draft} onChange={(e) => setDraft(e.target.value)} placeholder="Write a message…" className="flex-1" />
             <Button variant="primary" size="md" type="submit"><Send size={14} /> Send</Button>
